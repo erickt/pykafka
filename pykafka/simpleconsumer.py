@@ -164,6 +164,7 @@ class SimpleConsumer(object):
 
         self._auto_commit_enable = auto_commit_enable
         self._auto_commit_interval_ms = auto_commit_interval_ms
+        self._auto_commit_worker_thread = None
         self._last_auto_commit = time.time()
         self._worker_exception = None
         self._worker_trace_logged = False
@@ -318,6 +319,9 @@ class SimpleConsumer(object):
         self._running = False
         if self._auto_commit_enable and self._consumer_group is not None:
             self.commit_offsets()
+
+        if self._auto_commit_worker_thread is not None:
+            self._auto_commit_worker_thread.join()
 
     def _setup_autocommit_worker(self):
         """Start the autocommitter thread"""
